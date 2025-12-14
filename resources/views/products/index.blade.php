@@ -30,15 +30,19 @@
                         Stok: {{ $product->stock > 0 ? $product->stock : 'Habis' }}
                     </div>
 
-                    @if($product->stock > 0)
-                        <a href="#" class="bg-green-700 text-white px-3 py-1 rounded mt-2 inline-block">
-                            Tambah ke Keranjang
-                        </a>
-                    @else
-                        <span class="bg-gray-400 text-white px-3 py-1 rounded mt-2 inline-block">
-                            Stok Habis
-                        </span>
-                    @endif
+    @if($product->stock > 0)
+		<form action="{{ route('cart.store', $product->id) }}" method="POST" class="mt-2">
+        @csrf
+        <button type="submit" class="bg-green-700 text-white px-3 py-1 rounded inline-block">
+            Tambah ke Keranjang
+        </button>
+		</form>
+	@else
+    <span class="bg-gray-400 text-white px-3 py-1 rounded mt-2 inline-block">
+        Stok Habis
+    </span>
+	@endif
+                    
 
                     {{-- Tombol Kelola Produk hanya untuk admin/superadmin --}}
                     @can('add-product')

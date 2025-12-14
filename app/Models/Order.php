@@ -10,15 +10,15 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'address',
-        'payment_method',
-        'notes',
-        'transaction_number',
-        'total',
-        'unique_code',
-        'status',
-    ];
+    'user_id',
+    'address',
+    'notes',
+    'kode_transaksi',
+    'jumlah_pembayaran',
+    'jenis_pembayaran',
+    'total',
+    'status',
+	];
 
     public function items()
     {
