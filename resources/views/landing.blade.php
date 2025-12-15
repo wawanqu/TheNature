@@ -21,13 +21,15 @@
                     <div class="text-green-600">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
                     <div class="text-sm text-gray-600">Stok: {{ $product->stock }}</div>
 
+
                     {{-- Tombol untuk user biasa --}}
                     @if($product->stock > 0)
                         <form action="{{ route('cart.add', $product->id) }}" method="POST">
                             @csrf
-                            <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded mt-2">
+                            <button class="btn-add-cart" data-id="{{ $product->id }}">
                                 🛒 Tambah ke Keranjang
                             </button>
+							<span id="cart-count">{{ $cartCount ?? 0 }}</span>
                         </form>
                     @else
                         <span class="bg-gray-400 text-white px-3 py-1 rounded mt-2 inline-block">
@@ -59,4 +61,32 @@
         {{-- Pagination --}}
         <div class="mt-6">{{ $products->links() }}</div>
     @endif
+@endsection
+@section('scripts')
+<script>
+document.querySelectorAll('.btn-add-cart').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        let productId = this.dataset.id;
+
+        fetch(`/cart/add/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.success);
+                document.getElementById('cart-count').textContent = data.cart_count;
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch(err => console.error(err));
+    });
+});
+</script>
 @endsection
