@@ -40,8 +40,13 @@
 
                 {{-- Menu Super Admin --}}
                 @can('manage-roles')
-				{{--  <a href="{{ route('roles.index') }}">Kelola Role</a> --}}
+				<li class="nav-item">
+				<a class="nav-link" href="{{ route('roles.index') }}">
+				Kelola Peran
+				</a>
+				</li>
                 @endcan
+				
 
                 {{-- Logout --}}
                 <form method="POST" action="{{ route('logout') }}" class="inline">

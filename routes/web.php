@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\RoleController;
 
 
 /*
@@ -76,4 +77,10 @@ Route::put('/products/{product}', [ProductController::class, 'update'])->name('p
 Route::middleware('auth')->group(function () {
     Route::post('/cart/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+});
+
+// Tambah role user
+Route::middleware(['auth', 'can:manage-roles'])->group(function () {
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::post('/roles/{user}', [RoleController::class, 'update'])->name('roles.update');
 });
