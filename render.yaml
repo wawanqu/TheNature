@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: thenature-app
+    env: docker
+    plan: free
+    buildCommand: "npm install && npm run build && composer install --no-dev --optimize-autoloader && php artisan config:clear && php artisan route:clear && php artisan view:clear"
+    startCommand: "php artisan migrate --force && php artisan serve --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        value: base64:isiKeyLaravelKamu
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: dpg-d4vvd4ali9vc73e14r10-a.render.com
+      - key: DB_PORT
+        value: 5432
+      - key: DB_DATABASE
+        value: alamin_db
+      - key: DB_USERNAME
+        value: alamin_db_user
+      - key: DB_PASSWORD
+        value: Y77dnNm2srYTu9OIxrsDkPmkvi0K8AdC
+databases:
+  - name: alamin-db
+    plan: free
+    databaseName: alamin_db_user
+    
+   
