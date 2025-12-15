@@ -4,23 +4,34 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use Illuminate\Support\Facades\Auth; 
 
 class OrderController extends Controller
-{
-    /**
-     * Tampilkan riwayat semua pesanan user.
-     */
-    public function mine()
+{	
+	public function mine()
     {
-        // Ambil semua pesanan milik user, urutkan terbaru paling atas
-        $orders = Order::where('user_id', auth()->id())
-                       ->latest()
+        $orders = Order::where('user_id', Auth::id())
+                       ->with('product')
                        ->get();
 
-        // Kirim ke view orders.mine
-        return view('orders.mine', [
-            'orders' => $orders,
-            'paymentNotice' => 'Sementara ini, Pembayaran hanya menggunakan QRIS, bisa lihat Navigasi di atas',
+        return view('orders.mine', compact('orders'));
+    }
+
+    public function index()
+    {
+        $orders = Order::with(['user','product'])->get();
+        return view('orders.admin', compact('orders'));
+    }
+
+    public function update(Request $request, Order $order)
+    {
+        $request->validate([
+            'status' => 'required|string|in:Belum dibayar,Lunas,Diproses,Selesai,Dibatalkan'
         ]);
+
+        $order->status = $request->status;
+        $order->save();
+
+        return redirect()->route('orders.admin')->with('success', 'Status pesanan berhasil diperbarui!');
     }
 }

@@ -34,10 +34,14 @@
 				@endcan
 
 
-                @can('manage-orders')
-				{{--   <a href="{{ route('orders.index') }}">Administrasi Order</a> --}}
-                @endcan
-
+               	@can('manage-orders')
+				<li class="nav-item">
+				<a class="nav-link" href="{{ route('orders.admin') }}">
+				Admin Pesanan
+				</a>
+				</li>
+				@endcan
+				
                 {{-- Menu Super Admin --}}
                 @can('manage-roles')
 				<li class="nav-item">

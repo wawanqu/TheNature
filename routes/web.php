@@ -84,3 +84,9 @@ Route::middleware(['auth', 'can:manage-roles'])->group(function () {
     Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
     Route::post('/roles/{user}', [RoleController::class, 'update'])->name('roles.update');
 });
+
+// Tambah manage-orders
+Route::middleware(['auth', 'can:manage-orders'])->group(function () {
+    Route::get('/orders/admin', [OrderController::class, 'index'])->name('orders.admin');
+    Route::post('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+});
