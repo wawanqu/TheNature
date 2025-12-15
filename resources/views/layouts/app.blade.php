@@ -10,11 +10,13 @@
 
     {{-- Header global --}}
     <header class="bg-gradient-to-r from-yellow-200 to-green-200 p-6 text-center shadow">
-        {{-- Logo + Judul --}}
-        <div class="flex flex-col items-center">
-            <img src="{{ asset('images/Wakuraa.png') }}" alt="Logo The Nature" class="w-20 h-20 mb-2">
-            <h1 class="text-green-700 text-3xl font-bold">The Nature</h1>
-        </div>
+       
+
+    <div class="ml-4 leading-tight font-bold text-blue-600 text-3xl">
+	<img src="{{ asset('images/Wakuraa.png') }}" alt="Logo" class="h-16 w-16">
+        <div>The</div>
+        <div class="pl-1">Nature</div>
+    </div>
 
         {{-- Navigasi --}}
         <div class="flex justify-center space-x-6 mt-4">

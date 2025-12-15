@@ -11,17 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('order_items', function (Blueprint $table) {
-        $table->id();
-        $table->unsignedBigInteger('order_id');
-        $table->unsignedBigInteger('product_id');
-        $table->integer('quantity');
-        $table->string('description')->nullable();
-        $table->timestamps();
+        Schema::create('order_items', function (Blueprint $table) {
+            $table->id();
 
-        $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-        $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-    });
+            // relasi ke orders dan products
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('product_id');
+
+            // jumlah produk yang dibeli
+            $table->integer('quantity');
+
+            // snapshot data produk saat transaksi
+            $table->string('product_name');                   // nama produk
+            $table->text('product_description')->nullable();  // keterangan produk
+            $table->decimal('product_price', 12, 2);          // harga satuan produk
+
+            $table->timestamps();
+
+            // foreign key
+            $table->foreign('order_id')
+                  ->references('id')->on('orders')
+                  ->onDelete('cascade');
+
+            $table->foreign('product_id')
+                  ->references('id')->on('products')
+                  ->onDelete('cascade');
+        });
     }
 
     /**

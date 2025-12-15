@@ -14,6 +14,9 @@ class OrderItem extends Model
         'product_id',
         'quantity',
         'description',
+        'product_name',         // snapshot nama produk
+        'product_description',  // snapshot keterangan produk
+        'product_price',        // snapshot harga produk
     ];
 
     public function order()

@@ -73,4 +73,7 @@ Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name
 Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
 
 // Tambah produk ke keranjang
-Route::post('/cart/{product}', [CartController::class, 'add'])->name('cart.add');
+Route::middleware('auth')->group(function () {
+    Route::post('/cart/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+});

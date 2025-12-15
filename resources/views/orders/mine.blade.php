@@ -14,10 +14,15 @@
     <p>Saat ini hanya metode <strong>QRIS</strong> yang dapat digunakan.</p>
     <p>Kode QRIS Kami, pastikan nama toko: <strong>Wakuraa, Toserba Pakaian</strong>.</p>
     <img src="{{ asset('images/qris_statis.png') }}" alt="QRIS Wakuraa" class="w-64 h-64 my-4">
-    <p>
-        Pastikan Anda membayar sesuai jumlah pembayaran yaitu
-        <strong>Rp {{ number_format($orders->first()->jumlah_pembayaran,0,',','.') }}</strong>.
-    </p>
+
+    @if($orders->isNotEmpty())
+        <p>
+            Pastikan Anda membayar sesuai jumlah pembayaran yaitu
+            <strong>Rp {{ number_format($orders->first()->jumlah_pembayaran,0,',','.') }}</strong>.
+        </p>
+    @else
+        <p class="text-red-600">Belum ada pesanan, silakan kembali ke toko untuk berbelanja.</p>
+    @endif
 
     {{-- Riwayat transaksi --}}
     <h3 class="mt-6">Riwayat Transaksi</h3>
@@ -71,7 +76,15 @@
                         <h4 class="font-semibold">Detail Pesanan</h4>
                         <ul class="list-disc ml-6">
                             @foreach($order->items as $item)
-                                <li>{{ $item->product->name }} x {{ $item->quantity }}</li>
+                                <li>
+                                    {{ $item->product_name }}
+                                    @if(!empty($item->product_description))
+                                        - {{ $item->product_description }}
+                                    @endif
+                                    x {{ $item->quantity }}
+                                    (Rp {{ number_format($item->product_price,0,',','.') }} /item,
+                                    Total: Rp {{ number_format($item->product_price * $item->quantity,0,',','.') }})
+                                </li>
                             @endforeach
                         </ul>
                     </td>

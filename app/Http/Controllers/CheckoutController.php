@@ -11,6 +11,11 @@ class CheckoutController extends Controller
     public function index()
     {
         $cartItems = Cart::where('user_id', auth()->id())->get();
+        // kalau keranjang kosong
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('landing')
+                ->with('error', 'Keranjangmu masih kosong, silakan pilih produk dulu.');
+        }
 
         $total = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
         $countToday = Order::whereDate('created_at', now()->toDateString())->count() + 1;
@@ -36,57 +41,59 @@ class CheckoutController extends Controller
     }
 	
     public function store(Request $request)
-	{
-    // Ambil item keranjang user
-    $cartItems = Cart::where('user_id', auth()->id())->get();
+    {
+        // Ambil item keranjang user
+        $cartItems = Cart::where('user_id', auth()->id())->get();
 
-    if ($cartItems->isEmpty()) {
-        return redirect()->back()->with('error', 'Keranjang kosong');
-    }
+        if ($cartItems->isEmpty()) {
+            return redirect()->back()->with('error', 'Keranjang kosong');
+        }
 
-    // Hitung total harga dari keranjang
-    $total = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
+        // Hitung total harga dari keranjang
+        $total = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
 
-    // Generate kode transaksi: TH-ddmmyyyy-XXX
-    $countToday = Order::whereDate('created_at', now()->toDateString())->count() + 1;
-    $orderNumber = str_pad(($countToday % 1000), 3, '0', STR_PAD_LEFT);
-    $kodeTransaksi = 'TH-' . now()->format('dmY') . '-' . $orderNumber;
+        // Generate kode transaksi: TH-ddmmyyyy-XXX
+        $countToday = Order::whereDate('created_at', now()->toDateString())->count() + 1;
+        $orderNumber = str_pad(($countToday % 1000), 3, '0', STR_PAD_LEFT);
+        $kodeTransaksi = 'TH-' . now()->format('dmY') . '-' . $orderNumber;
 
-    // Hitung jumlah pembayaran (total + kode unik)
-    $jumlahUnik = substr($kodeTransaksi, -2);
-    $jumlahPembayaran = $total + $jumlahUnik;
+        // Hitung jumlah pembayaran (total + kode unik)
+        $jumlahUnik = substr($kodeTransaksi, -2);
+        $jumlahPembayaran = $total + $jumlahUnik;
 
-    // Simpan order utama
-    $order = Order::create([
-        'user_id'           => auth()->id(),
-        'address'           => $request->input('address'),
-        'notes'             => $request->input('notes'),
-        'total'             => $total,
-        'kode_transaksi'    => $kodeTransaksi,
-        'jumlah_pembayaran' => $jumlahPembayaran,
-        'status'            => 'Belum Dibayar',
-        'jenis_pembayaran'  => $request->input('payment_method'),
-    ]);
-
-    // Simpan detail item pesanan
-    foreach ($cartItems as $item) {
-        $order->items()->create([
-            'product_id'  => $item->product_id,
-            'quantity'    => $item->quantity,
-            'description' => $item->description,
+        // Simpan order utama
+        $order = Order::create([
+            'user_id'           => auth()->id(),
+            'address'           => $request->input('address'),
+            'notes'             => $request->input('notes'),
+            'total'             => $total,
+            'kode_transaksi'    => $kodeTransaksi,
+            'jumlah_pembayaran' => $jumlahPembayaran,
+            'status'            => 'Belum Dibayar',
+            'jenis_pembayaran'  => $request->input('payment_method'),
         ]);
 
-        // Kurangi stok produk
-        $product = $item->product;
-        $product->stock -= $item->quantity;
-        $product->save();
+        // Simpan detail item pesanan (snapshot produk)
+        foreach ($cartItems as $item) {
+            $order->items()->create([
+                'product_id'         => $item->product_id,
+                'product_name'       => $item->product->name,          // snapshot nama
+                'product_description'=> $item->product->description,  // snapshot keterangan
+                'product_price'      => $item->product->price,         // snapshot harga
+                'quantity'           => $item->quantity,
+            ]);
 
-        // Hapus dari keranjang
-        $item->delete();
+            // Kurangi stok produk
+            $product = $item->product;
+            $product->stock -= $item->quantity;
+            $product->save();
+
+            // Hapus dari keranjang
+            $item->delete();
+        }
+
+        return redirect()->route('orders.mine')
+                         ->with('success', 'Pesanan berhasil dibuat!')
+                         ->with('transaction_number', $kodeTransaksi);
     }
-
-    return redirect()->route('orders.mine')
-                     ->with('success', 'Pesanan berhasil dibuat!')
-                     ->with('transaction_number', $kodeTransaksi);
-	}
 }

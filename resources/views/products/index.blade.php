@@ -31,18 +31,22 @@
                     </div>
 
     @if($product->stock > 0)
+		@auth
 		<form action="{{ route('cart.store', $product->id) }}" method="POST" class="mt-2">
         @csrf
         <button type="submit" class="bg-green-700 text-white px-3 py-1 rounded inline-block">
             Tambah ke Keranjang
         </button>
 		</form>
+		@endauth
+		@guest
+		<a href="{{ route('register') }}"class="bg-green-500 text-white px-4 py-2 rounded inline-block">Tambah ke Keranjang</a>
+		@endguest
 	@else
     <span class="bg-gray-400 text-white px-3 py-1 rounded mt-2 inline-block">
         Stok Habis
     </span>
 	@endif
-                    
 
                     {{-- Tombol Kelola Produk hanya untuk admin/superadmin --}}
                     @can('add-product')

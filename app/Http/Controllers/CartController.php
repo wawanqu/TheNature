@@ -18,6 +18,11 @@ class CartController extends Controller
     // tambah produk ke keranjang
     public function store($id)
     {
+	if (!auth()->check()) {
+            return redirect()->route('register')
+                ->with('error', 'Silakan daftar dulu untuk menambahkan ke keranjang');
+        }
+
     $product = Product::findOrFail($id);
 
     $item = Cart::where('user_id', auth()->id())
@@ -75,3 +80,4 @@ class CartController extends Controller
 
 
 }
+
